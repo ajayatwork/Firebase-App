@@ -1,12 +1,13 @@
 // src/Signup.js
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { TextInput, Button, useTheme } from 'react-native-paper';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { router } from 'expo-router';
 import { auth } from '@/firebase';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 interface valueType{
     email: string,
     password: string,
@@ -14,8 +15,16 @@ interface valueType{
     phoneNo: string
 }
 
+const saveData = async (userData:any)=>{
+  try {
+    await AsyncStorage.setItem('token',"eybnjiuihy9y129837u23ibdasdnadpoqwer-oghgerth893");
+  } catch (e) {
+    // saving error
+    console.log("EEEEERRR", e);
+  }
+}
+
 const SignupScreen = () => {
-  const theme = useTheme();
   const loginValidationSchema = Yup.object().shape({
     email: Yup.string()
       .email('Please enter valid email')
@@ -33,8 +42,8 @@ const SignupScreen = () => {
   });
   const loginToFirebase = async (values:valueType)=>{
   createUserWithEmailAndPassword(auth, values.email, values.password)
-  .then(() => {
-    console.log('User account created & signed in!');
+  .then((userData) => {
+    saveData(userData)
   })
   .catch(error => {
     if (error.code === 'auth/email-already-in-use') {
